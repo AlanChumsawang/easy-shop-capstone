@@ -8,11 +8,12 @@ import org.yearup.data.ProductDao;
 import org.yearup.models.Category;
 import org.yearup.models.Product;
 
+import java.sql.SQLException;
 import java.util.List;
 
 
 @RestController
-@RequestMapping("categories")
+@RequestMapping("/categories")
 @CrossOrigin            // allows for cross-origin requests from the frontend allowing the frontend to access the backend
 public class CategoriesController
 {
@@ -29,22 +30,21 @@ public class CategoriesController
 
 
     // Pre-authorize annotation "permitAll" allows all users to access this method
-    @GetMapping
+    @GetMapping()
     @PreAuthorize("permitAll()")
-    public List<Category> getAll()
-    {
+    public List<Category> getAll() throws SQLException {
         //get all categories
         return categoryDao.getAllCategories();
 
     }
 
     // add the appropriate annotation for a get action
-    @GetMapping("{id}")
+    @RequestMapping(path = "/{id}")
     @PreAuthorize("permitAll()")
     public Category getById(@PathVariable int id)
     {
         // get the category by id
-        return getById(id);
+        return categoryDao.getById(id);
     }
 
     // the url to return all products in category 1 would look like this
@@ -54,7 +54,7 @@ public class CategoriesController
     public List<Product> getProductsById(@PathVariable int categoryId)
     {
         // get a list of product by categoryId
-        return getProductsById(categoryId);
+        return productDao.listByCategoryId(categoryId);
     }
 
     // add annotation to call this method for a POST action
@@ -64,7 +64,7 @@ public class CategoriesController
     public Category addCategory(@RequestBody Category category)
     {
         // insert the category
-        return addCategory(category);
+        return categoryDao.create(category);
     }
 
     // add annotation to call this method for a PUT (update) action - the url path must include the categoryId
@@ -74,7 +74,7 @@ public class CategoriesController
     public void updateCategory(@PathVariable int id, @RequestBody Category category)
     {
         // update the category by id
-        updateCategory(id, category);
+        categoryDao.update(id, category);
     }
 
 
@@ -85,6 +85,6 @@ public class CategoriesController
     public void deleteCategory(@PathVariable int id)
     {
         // delete the category by id
-        deleteCategory(id);
+        categoryDao.delete(id);
     }
 }
