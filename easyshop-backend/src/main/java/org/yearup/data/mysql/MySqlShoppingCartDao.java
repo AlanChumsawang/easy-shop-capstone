@@ -37,7 +37,6 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
                 int productId = resultSet.getInt("product_id");
                 int quantity = resultSet.getInt("quantity");
 
-                // Assuming you have a method to get a Product by its ID
                 Product product = getProductById(productId);
 
                 ShoppingCartItem item = new ShoppingCartItem();
@@ -101,17 +100,24 @@ public void removeProduct(int userId, int productId) {
 
 @Override
 public void clearCart(int userId) {
-
+    String sql = "DELETE FROM shopping_cart WHERE user_id = ?";
+    try (Connection connection = getConnection()){
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setInt(1, userId);
+        statement.executeUpdate();
+    } catch (SQLException e) {
+        throw new RuntimeException(e);
+    }
 }
 
 @Override
 public void updateQuantity(int userId, int productId, int quantity) {
-    // Implementation here
+    // TODO Implementation here
 }
 
 @Override
 public void checkout(int userId) {
-    // Implementation here
+    // TODO Implementation here
 }
 
     private Product mapRow(ResultSet row) throws SQLException {
