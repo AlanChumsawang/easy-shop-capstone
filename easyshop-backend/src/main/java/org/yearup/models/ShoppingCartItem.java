@@ -36,6 +36,7 @@ public class ShoppingCartItem
         return discountPercent;
     }
 
+
     public void setDiscountPercent(BigDecimal discountPercent)
     {
         this.discountPercent = discountPercent;
