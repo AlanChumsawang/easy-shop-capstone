@@ -70,55 +70,87 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
         }
 
         return product;
-       }
-
-
-@Override
-public void addProduct(int userId, int productId, int quantity) throws SQLException {
-    try (Connection connection = getConnection()) {
-        PreparedStatement statement = connection.prepareStatement("INSERT INTO shopping_cart (user_id, product_id, quantity) VALUES (?, ?, ?)");
-        statement.setInt(1, userId);
-        statement.setInt(2, productId);
-        statement.setInt(3, quantity);
-        statement.executeUpdate();
     }
-}
 
-@Override
-@ResponseStatus(HttpStatus.NO_CONTENT)
-public void removeProduct(int userId, int productId) {
-    String sql = "DELETE FROM shopping_cart WHERE user_id = ? AND product_id = ?";
-    try (Connection connection = getConnection()){
-        PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setInt(1, userId);
-        statement.setInt(2, productId);
-        statement.executeUpdate();
-    } catch (SQLException e) {
-        throw new RuntimeException(e);
+
+    @Override
+    public void addProduct(int userId, int productId, int quantity) throws SQLException {
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO shopping_cart (user_id, product_id, quantity) VALUES (?, ?, ?)");
+            statement.setInt(1, userId);
+            statement.setInt(2, productId);
+            statement.setInt(3, quantity);
+            statement.executeUpdate();
+        }
     }
-}
 
-@Override
-public void clearCart(int userId) {
-    String sql = "DELETE FROM shopping_cart WHERE user_id = ?";
-    try (Connection connection = getConnection()){
-        PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setInt(1, userId);
-        statement.executeUpdate();
-    } catch (SQLException e) {
-        throw new RuntimeException(e);
+    @Override
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeProduct(int userId, int productId) {
+        String sql = "DELETE FROM shopping_cart WHERE user_id = ? AND product_id = ?";
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, userId);
+            statement.setInt(2, productId);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
-}
 
-@Override
-public void updateQuantity(int userId, int productId, int quantity) {
-    // TODO Implementation here
-}
+    @Override
+    public void clearCart(int userId) {
+        String sql = "DELETE FROM shopping_cart WHERE user_id = ?";
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, userId);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-@Override
-public void checkout(int userId) {
-    // TODO Implementation here
-}
+    @Override
+    public void updateQuantity(int userId, int productId, int quantity) {
+        // TODO Implementation here
+    }
+
+    @Override
+    public void checkout(int userId) {
+        String query = """
+                    SELECT address, city, state, zip FROM users WHERE user_id = ?;
+                    INSERT INTO orders (user_id, date, address, city, state, zip, shipping_amount) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?);
+                    DELETE FROM shopping_cart WHERE user_id = ?;
+                """;
+
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(query);
+
+
+            statement.setInt(1, userId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                statement.setInt(2, userId);
+                statement.setDate(3, new java.sql.Date(System.currentTimeMillis()));
+                statement.setString(4, resultSet.getString("address"));
+                statement.setString(5, resultSet.getString("city"));
+                statement.setString(6, resultSet.getString("state"));
+                statement.setString(7, resultSet.getString("zip"));
+                statement.setBigDecimal(8, new BigDecimal(5.00));
+                statement.executeUpdate();
+            }
+
+            // Clear the shopping cart
+            statement.setInt(9, userId);
+            statement.executeUpdate();
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     private Product mapRow(ResultSet row) throws SQLException {
         int productId = row.getInt("product_id");
