@@ -9,6 +9,7 @@
 6. [Challenges](#6-challenges)
 7. [Solutions](#7-solutions)
 8. [Lessons Learned](#8-lessons-learned)
+9. [Screenshots](#9-screenshots)
 
 ## 1. Overview
 This project is an E-Commerce application built using Java, Spring Boot, and MySQL. It features a RESTful API backend
@@ -112,5 +113,14 @@ the EasyShop application, detailing the relationships and methods within each co
 - Utilizing Java Streams for efficient data processing.
     - **Streams**: Java Streams provide a powerful way to process collections of data. They allow for operations such as filtering, mapping, and reducing, which can be chained together to create concise and readable code. For example, using `stream().filter().map().collect()` to process a list of products.
         - Example: See `ShoppingCartController.java` in the `org.yearup.controllers` package.
-    
+
+## 9. Screenshots
+- **Login Screen**: The login screen allows users to authenticate themselves before accessing the application.
+  ![Login Screen](./images/login-screen.png)
+- **Home Page**: The home page displays a list of products available for purchase.
+  ![Home Page](./images/home-page.png)
+- **Profile Screen**: The profile screen shows user information and allows users to update their details.
+  ![Profile Screen](./images/profile-screen.png)
+- **Cart Screen**: The cart screen displays the items that the user has added to their shopping cart.
+  ![Cart Screen](./images/cart-screen.png)
 ```
