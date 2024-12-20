@@ -1,0 +1,243 @@
+@startuml
+
+package "API Endpoints" {
+    class "GET /cart"
+    class "POST /cart/products/{productId}"
+    class "PUT /cart/products/{productId}"
+    class "DELETE /cart/products/{productId}"
+    class "DELETE /cart"
+    class "POST /orders"
+    class "POST /login"
+    class "POST /register"
+    class "GET /profile"
+    class "PUT /profile"
+    class "GET /products"
+    class "GET /products/{id}"
+    class "POST /products"
+    class "PUT /products/{id}"
+    class "DELETE /products/{id}"
+    class "GET /categories"
+    class "GET /categories/{id}"
+    class "GET /categories/{categoryId}/products"
+    class "POST /categories"
+    class "PUT /categories/{id}"
+    class "DELETE /categories/{id}"
+}
+
+package "Controllers" {
+    class ShoppingCartController {
+        - ShoppingCartDao shoppingCartDao
+        - UserDao userDao
+        - ProductDao productDao
+        + ShoppingCart getCart(Principal principal)
+        + ShoppingCart addProduct(int productId, ShoppingCartItem item, Principal principal)
+        + void updateProduct(int productId, ShoppingCartItem item, Principal principal)
+        + void removeProduct(int productId, Principal principal)
+        + ShoppingCart clearCart(Principal principal)
+    }
+
+    class OrdersController {
+        - ShoppingCartDao shoppingCartDao
+        - UserDao userDao
+        + ResponseEntity<Map<String, Object>> createOrder(Principal principal)
+    }
+
+    class AuthenticationController {
+        - TokenProvider tokenProvider
+        - AuthenticationManagerBuilder authenticationManagerBuilder
+        - UserDao userDao
+        - ProfileDao profileDao
+        + ResponseEntity<LoginResponseDto> login(LoginDto loginDto)
+        + ResponseEntity<User> register(RegisterUserDto newUser)
+    }
+
+    class ProfileController {
+        - ProfileDao profileDao
+        - UserDao userDao
+        + Profile getProfile(Principal principal)
+        + Profile updateProfile(Profile profile, Principal principal)
+    }
+
+    class ProductsController {
+        - ProductDao productDao
+        + List<Product> search(Integer categoryId, BigDecimal minPrice, BigDecimal maxPrice, String color)
+        + Product getById(int id)
+        + Product addProduct(Product product)
+        + void updateProduct(int id, Product product)
+        + void deleteProduct(int id)
+    }
+
+    class CategoriesController {
+        - CategoryDao categoryDao
+        - ProductDao productDao
+        + List<Category> getAll()
+        + ResponseEntity<Category> getById(int id)
+        + List<Product> getProductsById(int categoryId)
+        + Category addCategory(Category category)
+        + void updateCategory(int id, Category category)
+        + ResponseEntity<Void> deleteCategory(int id)
+    }
+}
+
+package "DAOs" {
+    interface UserDao
+    interface ProfileDao
+    interface ProductDao
+    interface ShoppingCartDao
+    interface CategoryDao
+}
+
+package "Models" {
+    class User {
+        + int getId()
+        + void setId(int id)
+        + String getUsername()
+        + void setUsername(String username)
+        + String getPassword()
+        + void setPassword(String password)
+        + boolean isActivated()
+        + void setActivated(boolean activated)
+        + Set<Authority> getAuthorities()
+        + void setAuthorities(Set<Authority> authorities)
+        + void addRole(String role)
+    }
+
+    class Profile {
+        - int userId
+        - String firstName
+        - String lastName
+        - String phone
+        - String email
+        - String address
+        - String city
+        - String state
+        - String zip
+        + int getUserId()
+        + void setUserId(int userId)
+        + String getFirstName()
+        + void setFirstName(String firstName)
+        + String getLastName()
+        + void setLastName(String lastName)
+        + String getPhone()
+        + void setPhone(String phone)
+        + String getEmail()
+        + void setEmail(String email)
+        + String getAddress()
+        + void setAddress(String address)
+        + String getCity()
+        + void setCity(String city)
+        + String getState()
+        + void setState(String state)
+        + String getZip()
+        + void setZip(String zip)
+    }
+
+    class Product {
+        - int productId
+        - String name
+        - BigDecimal price
+        - int categoryId
+        - String description
+        - String color
+        - int stock
+        - boolean isFeatured
+        - String imageUrl
+        + int getProductId()
+        + void setProductId(int productId)
+        + String getName()
+        + void setName(String name)
+        + BigDecimal getPrice()
+        + void setPrice(BigDecimal price)
+        + int getCategoryId()
+        + void setCategoryId(int categoryId)
+        + String getDescription()
+        + void setDescription(String description)
+        + String getColor()
+        + void setColor(String color)
+        + int getStock()
+        + void setStock(int stock)
+        + boolean isFeatured()
+        + void setFeatured(boolean isFeatured)
+        + String getImageUrl()
+        + void setImageUrl(String imageUrl)
+    }
+
+    class ShoppingCartItem {
+        - Product product
+        - int quantity
+        - BigDecimal discountPercent
+        + Product getProduct()
+        + void setProduct(Product product)
+        + int getQuantity()
+        + void setQuantity(int quantity)
+        + BigDecimal getDiscountPercent()
+        + void setDiscountPercent(BigDecimal discountPercent)
+        + int getProductId()
+        + BigDecimal getLineTotal()
+    }
+
+    class ShoppingCart {
+        - Map<Integer, ShoppingCartItem> items
+        + Map<Integer, ShoppingCartItem> getItems()
+        + void setItems(Map<Integer, ShoppingCartItem> items)
+        + boolean contains(int productId)
+        + void add(ShoppingCartItem item)
+        + ShoppingCartItem get(int productId)
+        + BigDecimal getTotal()
+    }
+
+    class Category {
+        - int categoryId
+        - String name
+        - String description
+        + int getCategoryId()
+        + void setCategoryId(int categoryId)
+        + String getName()
+        + void setName(String name)
+        + String getDescription()
+        + void setDescription(String description)
+    }
+}
+
+"GET /cart" --> ShoppingCartController
+"POST /cart/products/{productId}" --> ShoppingCartController
+"PUT /cart/products/{productId}" --> ShoppingCartController
+"DELETE /cart/products/{productId}" --> ShoppingCartController
+"DELETE /cart" --> ShoppingCartController
+"POST /orders" --> OrdersController
+"POST /login" --> AuthenticationController
+"POST /register" --> AuthenticationController
+"GET /profile" --> ProfileController
+"PUT /profile" --> ProfileController
+"GET /products" --> ProductsController
+"GET /products/{id}" --> ProductsController
+"POST /products" --> ProductsController
+"PUT /products/{id}" --> ProductsController
+"DELETE /products/{id}" --> ProductsController
+"GET /categories" --> CategoriesController
+"GET /categories/{id}" --> CategoriesController
+"GET /categories/{categoryId}/products" --> CategoriesController
+"POST /categories" --> CategoriesController
+"PUT /categories/{id}" --> CategoriesController
+"DELETE /categories/{id}" --> CategoriesController
+
+ShoppingCartController --> ShoppingCartDao
+ShoppingCartController --> UserDao
+ShoppingCartController --> ProductDao
+OrdersController --> ShoppingCartDao
+OrdersController --> UserDao
+AuthenticationController --> UserDao
+AuthenticationController --> ProfileDao
+ProfileController --> ProfileDao
+ProfileController --> UserDao
+ProductsController --> ProductDao
+CategoriesController --> CategoryDao
+CategoriesController --> ProductDao
+
+ShoppingCartDao --> ShoppingCart
+UserDao --> User
+ProfileDao --> Profile
+ProductDao --> Product
+CategoryDao --> Category
+
+@enduml

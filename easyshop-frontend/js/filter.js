@@ -1,6 +1,3 @@
-
-
-
 function loadCategories(categories)
 {
     const select = document.getElementById('category-select');
@@ -14,5 +11,4 @@ function loadCategories(categories)
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-}
-
+})
