@@ -69,7 +69,7 @@ I organized the project using a GitHub Project board with the following columns:
 The UML diagram illustrates the structure and interactions between the API endpoints, controllers, DAOs, and models in
 the EasyShop application, detailing the relationships and methods within each component.
 
-![UML Diagram](./images/uml.png)
+![UML Diagram](./images/UML.png)
 
 ## 5. Approach
 
