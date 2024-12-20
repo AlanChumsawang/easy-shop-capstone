@@ -33,8 +33,8 @@ Change the following properties in the `application.properties` file:
 ### Steps
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
-   cd <repository-directory>
+   git clone <https://github.com/AlanChumsawang/easyshop-capstone.git>
+   cd <easyshop-capstone>
    ```
 
 2. Run the application:
